@@ -63,6 +63,13 @@ def error_check_create(message, *args):
 	
 	return ({"nft_name":nft_name, "starting_price":auction_price, "start_date":auction_st_date, "start_time":auction_st_time, "end_date":auction_end_date, "end_time":auction_end_time, "image":auction_image})
 
+def auction_ended(auction):
+  time = str(messages.get_remaining_time(auction))
+  if time.startswith("-"):
+    return (1)
+  return (0)
+  
+
 class general_commands(commands.Cog):
   @commands.command()
   async def create(self, message, *args):
@@ -97,10 +104,15 @@ class general_commands(commands.Cog):
     if (is_authorised_user(message) == 0 and not is_exception_channel(message)):
       await message.reply("You need to have a holder role in order to bet!")
       return
-    
     nft_name = message.channel.name.replace("auction-","")
     auction = api_firestore.get_auction(nft_name)
-    status = api_firestore.update_auction(auction["nft_name"], int(auction["price"]) + INCREMENT_AMOUNT, message.author.name)
+    if (auction_ended(auction)):
+      await message.reply("Sorry, no more bids, auction has ended!")
+      return
+    if (auction["highest_bidder"] == ""):
+      status = api_firestore.update_auction(auction["nft_name"], int(auction["price"]), message.author.name)
+    else:
+      status = api_firestore.update_auction(auction["nft_name"], int(auction["price"]) + INCREMENT_AMOUNT, message.author.name)
     if (status == 1):
       await message.channel.send(embed=messages.success_bet(message, auction["nft_name"], int(auction["price"]) + INCREMENT_AMOUNT))
     else:

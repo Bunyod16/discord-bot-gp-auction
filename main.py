@@ -45,9 +45,6 @@ def get_created_channel(nft_name):
 			return (channel)
 
 async def init_auction(nft_name):
-	status = api_firestore.update_auction_start(nft_name, 1)
-	if (status == 0):
-		return
 	guild = bot.get_guild(GUILD_ID)
 	name = sanitise(f"auction-{nft_name}")
 	category = get_auction_category(guild.categories)
@@ -58,6 +55,8 @@ async def init_auction(nft_name):
 		print("channel created")
 		await guild.create_text_channel(name = name, category = category)
 		channel = get_created_channel(nft_name)
+		if (channel != None):
+			api_firestore.update_auction_start(nft_name, 1)
 	return (channel)
 
 async def check_auction_start():

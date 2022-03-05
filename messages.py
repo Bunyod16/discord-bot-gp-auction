@@ -91,7 +91,7 @@ def create_new(result):
 def auction_start(info):
 	title = f"Attention! Auction Started!"
 	time_left = get_remaining_time(info)
-	fields = [{"name":"NFT", "description": f"{info['nft_name']}"},
+	fields = [{"name":"NFT", "description": f"**{info['nft_name'].upper()}**"},
 				  {"name":"Starting Price", "description": f"`{info['price']}` ADA"},
 				  {"name":"Increment", "description": f"`{INCREMENT_AMOUNT}` ADA"},
 				  {"name":"Ends in", "description": f"{time_left}"},
@@ -104,8 +104,11 @@ def auction_start(info):
 	return (message)
 
 def auction_end(info):
-	title = f"Auction for **{info['nft_name']}** has finished!"
-	fields = [{"name":f"**{info['nft_name']}** was sold to **{info['highest_bidder']}** for **{info['price']} ADA**", "description":f"Congratulations to **{info['highest_bidder']}**!"}]
+	title = f"Congratulations! Auction Ended!"
+	time_left = get_remaining_time(info)
+	fields = [{"name":"NFT", "description": f"**{info['nft_name'].upper()}**"},
+				  {"name":"New Owner", "description": f"{info['highest_bidder']}"},
+				  {"name":"Price", "description": f"{info['price']} ADA"}]
 	if (info["highest_bidder"] == ""):
 		title = f"Nobody has placed bids on **{info['nft_name']}**!"
 		fields = [{"name":f"Today I admit defeat but I'll be back with an offer. you cant refuse!",
